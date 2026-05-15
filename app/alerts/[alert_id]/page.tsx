@@ -124,7 +124,7 @@ export default async function AlertDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
