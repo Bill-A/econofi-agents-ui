@@ -105,8 +105,20 @@ export function generateNarrative(alert: BsaAmlAlert, institutionType: 'bank' | 
   const chronology = txns.length > 0 ? buildTransactionChronology(txns) : '  [NO TRANSACTIONS AVAILABLE — REVIEW REQUIRED]';
   const dateRange = txns.length > 0 ? getActivityDateRange(txns) : { from: '[START DATE — REVIEW REQUIRED]', to: '[END DATE — REVIEW REQUIRED]' };
   const totalAmount = txns.length > 0 ? getTotalAmount(txns) : '[TOTAL AMOUNT — REVIEW REQUIRED]';
+  const filingDeadline = formatShortDate(alert.expires_at);
 
-  return `SUBJECT OF SUSPICIOUS ACTIVITY
+  const investigationNotesBlock = alert.investigation_notes
+    ? `  (1) Investigation summary: ${alert.investigation_notes}\n\n  (2) Account and customer review: [SUPPLEMENT WITH ACCOUNT HISTORY AND CDD FINDINGS — REVIEW REQUIRED]\n\n  (3) Customer contact: [DESCRIBE INQUIRY AND ANY EXPLANATION PROVIDED — REVIEW REQUIRED]\n\n  (4) Community and relationship context: [MDI/COMMUNITY CONTEXT ASSESSMENT — REVIEW REQUIRED]`
+    : `  (1) Account and customer review: [DESCRIBE ACCOUNT HISTORY AND CDD FINDINGS — REVIEW REQUIRED]\n\n  (2) Transaction pattern review: [DESCRIBE PRIOR TRANSACTION PATTERNS AND BASELINE — REVIEW REQUIRED]\n\n  (3) Customer contact: [DESCRIBE INQUIRY AND ANY EXPLANATION PROVIDED — REVIEW REQUIRED]\n\n  (4) Community and relationship context: [MDI/COMMUNITY CONTEXT ASSESSMENT — REVIEW REQUIRED]`;
+
+  return `NO TIPPING OFF — 31 USC §5318(g)(2)
+Do not notify the subject, or any person involved in the transaction, that this SAR has been or will be filed. Disclosure of a SAR or its contents is prohibited by law. This document must be stored securely and access limited to those with a need to know.
+
+FILING DEADLINE: ${filingDeadline} (30 days from detection per 31 CFR §1020.320)
+
+---
+
+SUBJECT OF SUSPICIOUS ACTIVITY
 
 IMPORTANT: ${alert.customer_token} is a system-assigned privacy token. Before filing, replace with the subject's full legal name, SSN/TIN, date of birth, address, and account number from your institution's records and de-tokenization vault. Do not submit this document with token references.
 
@@ -141,13 +153,7 @@ INVESTIGATION CONDUCTED
 
 Upon identification of this activity, [INSTITUTION NAME — REVIEW REQUIRED]'s BSA Officer conducted the following investigation:
 
-  (1) Account and customer review: [DESCRIBE ACCOUNT HISTORY AND CDD FINDINGS — REVIEW REQUIRED]
-
-  (2) Transaction pattern review: [DESCRIBE PRIOR TRANSACTION PATTERNS AND BASELINE — REVIEW REQUIRED]
-
-  (3) Customer contact: [DESCRIBE INQUIRY AND ANY EXPLANATION PROVIDED — REVIEW REQUIRED]
-
-  (4) Community and relationship context: [MDI/COMMUNITY CONTEXT ASSESSMENT — REVIEW REQUIRED]
+${investigationNotesBlock}
 
 BASIS FOR FILING
 
