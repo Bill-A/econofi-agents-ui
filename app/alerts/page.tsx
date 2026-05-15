@@ -138,12 +138,12 @@ export default async function AlertsPage({ searchParams }: PageProps) {
         </div>
         <div className={`bg-white rounded-lg px-5 py-4 border ${overdueCount > 0 ? 'border-amber-300' : 'border-[#e9ecef]'}`}>
           <p className={`text-xs font-semibold uppercase tracking-wide ${overdueCount > 0 ? 'text-amber-600' : 'text-[#3d4557]'}`}>
-            Overdue
+            Open Past Deadline
           </p>
           <p className={`text-3xl font-bold mt-1 ${overdueCount > 0 ? 'text-amber-600' : 'text-[#13204c]'}`}>
             {overdueCount}
           </p>
-          <p className="text-xs text-[#3d4557] mt-1">open &gt;25 days</p>
+          <p className="text-xs text-[#3d4557] mt-1">open investigations &gt;25 days</p>
         </div>
         <div className="bg-white border border-[#0d7a6b]/30 rounded-lg px-5 py-4">
           <p className="text-xs font-semibold text-[#0d7a6b] uppercase tracking-wide">SARs This Month</p>
