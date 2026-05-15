@@ -17,6 +17,30 @@ export type InvestigationStatus =
 
 export type RecommendedAction = 'monitor' | 'investigate' | 'file_sar' | 'escalate_immediately';
 
+export const CLOSURE_REASON_CODES = [
+  'tanda_cycle',
+  'documented_business_purpose',
+  'prior_cdd_review',
+  'seasonal_income',
+  'institutional_knowledge',
+  'insufficient_evidence',
+  'system_false_positive',
+  'other',
+] as const;
+
+export type ClosureReasonCode = (typeof CLOSURE_REASON_CODES)[number];
+
+export const CLOSURE_REASON_LABELS: Record<ClosureReasonCode, string> = {
+  tanda_cycle: 'Tanda Cycle / Informal Savings',
+  documented_business_purpose: 'Documented Business Purpose',
+  prior_cdd_review: 'Prior CDD Review',
+  seasonal_income: 'Seasonal Income',
+  institutional_knowledge: 'Institutional Knowledge',
+  insufficient_evidence: 'Insufficient Evidence',
+  system_false_positive: 'System False Positive',
+  other: 'Other',
+};
+
 export interface BsaAmlAlert {
   id: string;
   alert_id: string;
@@ -37,6 +61,20 @@ export interface BsaAmlAlert {
   investigation_status: InvestigationStatus;
   investigation_notes: string | null;
   investigation_completed_at: string | null;
+  closure_reason_code: string | null;
+  closure_reason_detail: string | null;
+}
+
+export interface AlertEvent {
+  id: string;
+  alert_id: string;
+  event_type: string;
+  from_status: string | null;
+  to_status: string;
+  notes: string | null;
+  closure_reason_code: string | null;
+  actor: string | null;
+  created_at: string;
 }
 
 export interface AlertListResponse {

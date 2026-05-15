@@ -6,10 +6,10 @@ const steps = [
   {
     time: '0:00 – 0:30',
     tool: 'TransactionMonitor',
-    toolUrl: 'localhost:5173',
+    toolUrl: 'econofi-demo.netlify.app',
     heading: 'Select institution type',
     actions: [
-      'Open localhost:5173 in a browser tab — have it ready before the demo starts.',
+      'Open econofi-demo.netlify.app in a browser tab — have it ready before the demo starts.',
       'Pick Bank or Credit Union. This choice drives the MDI context paragraphs and institution name throughout.',
     ],
     lookFor: [],
@@ -17,7 +17,7 @@ const steps = [
   {
     time: '0:30 – 1:00',
     tool: 'TransactionMonitor',
-    toolUrl: 'localhost:5173',
+    toolUrl: 'econofi-demo.netlify.app',
     heading: 'Walk the transaction feed',
     actions: [
       'Point out the 7 highlighted rows — explain that 7 individual transactions belong to 3 distinct patterns.',
@@ -32,7 +32,7 @@ const steps = [
   {
     time: '1:00 – 2:00',
     tool: 'TransactionMonitor',
-    toolUrl: 'localhost:5173',
+    toolUrl: 'econofi-demo.netlify.app',
     heading: 'Flag detail — pattern and MDI context',
     actions: [
       'Read the pattern summary aloud: "$9,200 / $9,400 / $9,150 — three branches, five days, never hits the $10K CTR threshold."',
@@ -47,7 +47,7 @@ const steps = [
   {
     time: '2:00 – 2:45',
     tool: 'TransactionMonitor',
-    toolUrl: 'localhost:5173',
+    toolUrl: 'econofi-demo.netlify.app',
     heading: 'SAR draft',
     actions: [
       'Point to the amber placeholders — these are the sections requiring the officer\'s review.',
@@ -128,8 +128,8 @@ export function DemoGuide() {
         className="w-full flex items-center justify-between px-6 py-4 bg-[#f7f8fa] hover:bg-[#eef0f5] transition-colors text-left"
       >
         <div>
-          <span className="text-base font-bold text-[#13204c]">Demo Guide</span>
-          <span className="ml-3 text-xs font-mono text-[#3d4557]">5-minute walkthrough — what to do and what to look for</span>
+          <span className="text-lg font-bold text-[#13204c]">Demo Guide</span>
+          <span className="ml-3 text-sm font-mono text-[#3d4557]">5-minute walkthrough — what to do and what to look for</span>
         </div>
         <span className="text-[#3d4557] text-lg font-light select-none">{open ? '−' : '+'}</span>
       </button>
@@ -140,19 +140,19 @@ export function DemoGuide() {
             <div key={i} className="px-6 py-5 bg-white">
 
               <div className="flex items-start gap-4 mb-3">
-                <span className="shrink-0 font-mono text-xs text-white bg-[#13204c] px-2 py-0.5 rounded mt-0.5">
+                <span className="shrink-0 font-mono text-sm text-white bg-[#13204c] px-2.5 py-1 rounded mt-0.5">
                   {step.time}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <h3 className="text-sm font-bold text-[#13204c]">{step.heading}</h3>
+                    <h3 className="text-base font-bold text-[#13204c]">{step.heading}</h3>
                     {step.toolUrl && (
-                      <span className="text-xs font-mono text-[#00a4b4] bg-[#f0fafa] border border-[#c0e8ec] px-1.5 py-0.5 rounded">
+                      <span className="text-sm font-mono text-[#00a4b4] bg-[#f0fafa] border border-[#c0e8ec] px-2 py-0.5 rounded">
                         {step.tool}
                       </span>
                     )}
                     {!step.toolUrl && step.tool !== 'Close' && (
-                      <span className="text-xs font-mono text-[#3d4557]">{step.tool}</span>
+                      <span className="text-sm font-mono text-[#3d4557]">{step.tool}</span>
                     )}
                   </div>
                 </div>
@@ -160,11 +160,11 @@ export function DemoGuide() {
 
               <div className={`grid gap-4 ${step.lookFor.length > 0 ? 'sm:grid-cols-2' : 'grid-cols-1'}`}>
                 <div>
-                  <p className="text-xs font-semibold text-[#3d4557] uppercase tracking-wider mb-1.5">Actions</p>
+                  <p className="text-sm font-semibold text-[#3d4557] uppercase tracking-wider mb-1.5">Actions</p>
                   <ol className="space-y-1.5">
                     {step.actions.map((action, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm text-[#3d4557]">
-                        <span className="shrink-0 font-mono text-[10px] text-[#0d7a6b] font-bold mt-1">{j + 1}.</span>
+                      <li key={j} className="flex items-start gap-2 text-base text-[#3d4557]">
+                        <span className="shrink-0 font-mono text-sm text-[#0d7a6b] font-bold mt-0.5">{j + 1}.</span>
                         {action}
                       </li>
                     ))}
@@ -173,11 +173,11 @@ export function DemoGuide() {
 
                 {step.lookFor.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-[#0d7a6b] uppercase tracking-wider mb-1.5">What to look for</p>
+                    <p className="text-sm font-semibold text-[#0d7a6b] uppercase tracking-wider mb-1.5">What to look for</p>
                     <ul className="space-y-1.5">
                       {step.lookFor.map((item, j) => (
-                        <li key={j} className="flex items-start gap-2 text-sm text-[#3d4557]">
-                          <span className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full bg-[#0d7a6b]" />
+                        <li key={j} className="flex items-start gap-2 text-base text-[#3d4557]">
+                          <span className="shrink-0 mt-2 w-1.5 h-1.5 rounded-full bg-[#0d7a6b]" />
                           {item}
                         </li>
                       ))}
@@ -189,7 +189,7 @@ export function DemoGuide() {
               {step.note && (
                 <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-200 rounded px-3 py-2">
                   <span className="text-amber-500 text-sm shrink-0">⚠</span>
-                  <p className="text-xs text-amber-800 leading-relaxed">{step.note}</p>
+                  <p className="text-sm text-amber-800 leading-relaxed">{step.note}</p>
                 </div>
               )}
 

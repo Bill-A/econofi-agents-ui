@@ -1,9 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getAlert } from '@/lib/api';
+import { getAlert, getAlertEvents } from '@/lib/api';
 import { ALERT_TYPE_LABELS, RECOMMENDED_ACTION_LABELS } from '@/lib/types';
 import { SeverityBadge } from '@/components/SeverityBadge';
 import { StatusBadge } from '@/components/StatusBadge';
+import { AuditTrail } from '@/components/AuditTrail';
 import { InvestigationForm } from './InvestigationForm';
 
 interface PageProps {
@@ -12,7 +13,10 @@ interface PageProps {
 
 export default async function AlertDetailPage({ params }: PageProps) {
   const { alert_id: alertId } = await params;
-  const alert = await getAlert(alertId);
+  const [alert, events] = await Promise.all([
+    getAlert(alertId),
+    getAlertEvents(alertId),
+  ]);
 
   if (alert === null) {
     notFound();
@@ -144,6 +148,13 @@ export default async function AlertDetailPage({ params }: PageProps) {
               })}
             </div>
           )}
+
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+            <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+              Audit Trail
+            </h2>
+            <AuditTrail events={events} />
+          </div>
         </div>
       </div>
     </div>

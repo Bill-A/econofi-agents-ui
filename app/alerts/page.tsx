@@ -24,13 +24,13 @@ export default async function AlertsPage({ searchParams }: PageProps) {
   const end = Math.min(page * 25, pagination.total);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="px-6 lg:px-10 py-8">
 
       {/* Page header */}
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[#13204c] tracking-tight">BSA/AML Alert Dashboard</h1>
-          <p className="mt-1 text-sm text-[#3d4557]">
+          <h1 className="text-3xl font-bold text-[#13204c] tracking-tight">BSA/AML Alert Dashboard</h1>
+          <p className="mt-1 text-base text-[#3d4557]">
             Bank-scoped alerts — investigation workflow and SAR decision support
           </p>
         </div>
@@ -45,13 +45,13 @@ export default async function AlertsPage({ searchParams }: PageProps) {
       {/* Alert count summary bar */}
       {pagination.total > 0 && (
         <div className="mb-4 flex items-center gap-2">
-          <span className="text-xs font-mono text-[#3d4557] bg-[#e6f4f2] border border-[#0d7a6b]/20 px-2.5 py-1 rounded-full">
+          <span className="text-base font-mono text-[#3d4557] bg-[#e6f4f2] border border-[#0d7a6b]/20 px-3 py-1.5 rounded-full">
             {pagination.total} alert{pagination.total !== 1 ? 's' : ''}
           </span>
           {(params.severity || params.status) && (
             <Link
               href="/alerts"
-              className="text-xs text-[#0d7a6b] hover:underline font-medium"
+              className="text-base text-[#0d7a6b] hover:underline font-medium"
             >
               Clear filters
             </Link>
@@ -66,7 +66,7 @@ export default async function AlertsPage({ searchParams }: PageProps) {
         <div className="px-6 py-3 border-b border-[#e9ecef] bg-[#f7f8fa] flex items-center justify-between">
           <AlertFilters severity={params.severity} status={params.status} />
           {pagination.total > 0 && (
-            <span className="text-xs text-[#3d4557] font-mono">
+            <span className="text-base text-[#3d4557] font-mono">
               {start}–{end} of {pagination.total}
             </span>
           )}
@@ -81,14 +81,14 @@ export default async function AlertsPage({ searchParams }: PageProps) {
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-[#e9ecef]">
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Alert ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Severity</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Risk</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Date</th>
-                  <th className="px-6 py-3 bg-white" />
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Alert ID</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Type</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Severity</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Risk</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Customer</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Status</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Date</th>
+                  <th className="px-6 py-4 bg-white" />
                 </tr>
               </thead>
               <tbody>
@@ -99,22 +99,22 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                       i % 2 === 0 ? 'bg-white' : 'bg-[#f7f8fa]'
                     }`}
                   >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-xs font-mono text-[#1a1d26] bg-[#f7f8fa] border border-[#e9ecef] px-1.5 py-0.5 rounded">
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className="text-base font-mono font-semibold text-[#1a1d26]">
                         {alert.alert_id}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-[#1a1d26]">{ALERT_TYPE_LABELS[alert.alert_type]}</span>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className="text-lg font-medium text-[#1a1d26]">{ALERT_TYPE_LABELS[alert.alert_type]}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <SeverityBadge severity={alert.severity} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-[#e9ecef] rounded-full h-1.5">
+                        <div className="w-20 bg-[#e9ecef] rounded-full h-2">
                           <div
-                            className={`h-1.5 rounded-full transition-all ${
+                            className={`h-2 rounded-full transition-all ${
                               alert.risk_score >= 80
                                 ? 'bg-red-500'
                                 : alert.risk_score >= 60
@@ -124,19 +124,19 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                             style={{ width: `${alert.risk_score}%` }}
                           />
                         </div>
-                        <span className="text-sm font-semibold text-[#1a1d26] w-6 text-right">
+                        <span className="text-lg font-semibold text-[#1a1d26] w-8 text-right">
                           {alert.risk_score}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-mono text-[#3d4557]">{alert.customer_token}</span>
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className="text-lg font-mono text-[#3d4557]">{alert.customer_token}</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-5 whitespace-nowrap">
                       <StatusBadge status={alert.investigation_status} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-[#3d4557]">
+                    <td className="px-6 py-5 whitespace-nowrap">
+                      <span className="text-lg text-[#3d4557]">
                         {new Date(alert.created_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
@@ -144,10 +144,10 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                         })}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <td className="px-6 py-5 whitespace-nowrap text-right">
                       <Link
                         href={`/alerts/${alert.alert_id}`}
-                        className="text-sm font-semibold text-[#0d7a6b] hover:text-[#0a6459] hover:underline"
+                        className="text-lg font-semibold text-[#0d7a6b] hover:text-[#0a6459] hover:underline"
                       >
                         Investigate
                       </Link>

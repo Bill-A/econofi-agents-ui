@@ -9,7 +9,7 @@ const styles: Record<AlertSeverity, string> = {
 
 export function SeverityBadge({ severity }: { severity: AlertSeverity }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold font-mono uppercase tracking-widest ${styles[severity]}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded text-sm font-semibold font-mono uppercase tracking-widest ${styles[severity]}`}>
       {severity}
     </span>
   );

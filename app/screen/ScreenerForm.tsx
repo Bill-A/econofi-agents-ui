@@ -28,6 +28,20 @@ const TRANSACTION_TYPES = [
   { value: 'check_withdrawal', label: 'Check Withdrawal' },
 ];
 
+const COUNTERPARTY_COUNTRIES = [
+  { value: '', label: 'Domestic / None' },
+  { value: 'IR', label: 'IR — Iran (FATF blacklist)' },
+  { value: 'KP', label: 'KP — North Korea (FATF blacklist)' },
+  { value: 'MM', label: 'MM — Myanmar (FATF blacklist)' },
+  { value: 'AE', label: 'AE — UAE (FATF greylist)' },
+  { value: 'TR', label: 'TR — Turkey (FATF greylist)' },
+  { value: 'PH', label: 'PH — Philippines (FATF greylist)' },
+  { value: 'PK', label: 'PK — Pakistan (FATF greylist)' },
+  { value: 'KY', label: 'KY — Cayman Islands (shell company jurisdiction)' },
+  { value: 'VG', label: 'VG — British Virgin Islands (shell company jurisdiction)' },
+  { value: 'PA', label: 'PA — Panama (shell company jurisdiction)' },
+];
+
 export function ScreenerForm() {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<ScreeningResult | undefined>(undefined);
@@ -49,7 +63,7 @@ export function ScreenerForm() {
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label htmlFor="customer_token" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="customer_token" className="block text-lg font-medium text-gray-700 mb-1">
             Customer Token
           </label>
           <input
@@ -59,12 +73,12 @@ export function ScreenerForm() {
             defaultValue={DEMO_DEFAULTS.customer_token}
             placeholder="[PERSON_001]"
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label htmlFor="account_hash" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="account_hash" className="block text-lg font-medium text-gray-700 mb-1">
             Account Hash (SHA-256)
           </label>
           <input
@@ -73,12 +87,12 @@ export function ScreenerForm() {
             type="text"
             defaultValue={DEMO_DEFAULTS.account_hash}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="amount" className="block text-lg font-medium text-gray-700 mb-1">
             Amount (USD)
           </label>
           <input
@@ -89,12 +103,12 @@ export function ScreenerForm() {
             min="0.01"
             defaultValue={DEMO_DEFAULTS.amount}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <div>
-          <label htmlFor="transaction_type" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="transaction_type" className="block text-lg font-medium text-gray-700 mb-1">
             Transaction Type
           </label>
           <select
@@ -102,7 +116,7 @@ export function ScreenerForm() {
             name="transaction_type"
             defaultValue={DEMO_DEFAULTS.transaction_type}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {TRANSACTION_TYPES.map((t) => (
               <option key={t.value} value={t.value}>{t.label}</option>
@@ -111,7 +125,7 @@ export function ScreenerForm() {
         </div>
 
         <div>
-          <label htmlFor="transaction_date" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="transaction_date" className="block text-lg font-medium text-gray-700 mb-1">
             Transaction Date
           </label>
           <input
@@ -120,8 +134,23 @@ export function ScreenerForm() {
             type="date"
             defaultValue={DEMO_DEFAULTS.transaction_date}
             required
-            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        <div>
+          <label htmlFor="counterparty_country" className="block text-lg font-medium text-gray-700 mb-1">
+            Counterparty Country
+          </label>
+          <select
+            id="counterparty_country"
+            name="counterparty_country"
+            className="w-full border border-gray-300 rounded-md px-3 py-3 text-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {COUNTERPARTY_COUNTRIES.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
         </div>
 
         <div className="flex items-center gap-3 pt-6">
@@ -132,7 +161,7 @@ export function ScreenerForm() {
             value="true"
             className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <label htmlFor="is_online_banking" className="text-sm text-gray-700">
+          <label htmlFor="is_online_banking" className="text-lg text-gray-700">
             Online banking transaction
           </label>
         </div>
@@ -141,7 +170,7 @@ export function ScreenerForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full flex justify-center items-center px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full flex justify-center items-center px-4 py-3 bg-blue-600 text-white text-base font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isPending ? 'Screening...' : 'Screen Transaction'}
       </button>

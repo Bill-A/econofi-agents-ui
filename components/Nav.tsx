@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { href: '/about', label: 'About' },
+  { href: '/', label: 'Home' },
   { href: '/alerts', label: 'Alert Dashboard' },
   { href: '/screen', label: 'Transaction Screener' },
 ];
@@ -15,6 +15,9 @@ export function Nav() {
 
   return (
     <nav className="bg-[#13204c] text-white shadow-sm">
+      <div className="bg-[#b45309] text-white text-center text-[11px] font-mono font-semibold tracking-widest uppercase py-1 px-4">
+        Demo Environment — Synthetic Data Only
+      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[70px] sm:h-[120px]">
 
@@ -36,7 +39,9 @@ export function Nav() {
           {/* Nav links — full-height click area, inner span carries the border-radius arc (econofi.app pattern) */}
           <div className="flex items-center gap-0 h-full">
             {links.map((link) => {
-              const active = pathname === link.href || pathname.startsWith(link.href + '/');
+              const active = link.href === '/'
+                ? pathname === '/'
+                : pathname === link.href || pathname.startsWith(link.href + '/');
               return (
                 <Link
                   key={link.href}

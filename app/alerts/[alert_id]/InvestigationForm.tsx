@@ -1,11 +1,13 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { updateInvestigationStatus } from './actions';
 import type { ActionState } from './actions';
 import type { BsaAmlAlert, InvestigationStatus } from '@/lib/types';
 import { INVESTIGATION_STATUS_LABELS } from '@/lib/types';
 import { SARNarrativePanel } from '@/components/SARNarrativePanel';
+import { ClosureReasonPanel } from '@/components/ClosureReasonPanel';
 
 const STATUSES: InvestigationStatus[] = [
   'pending',
@@ -28,9 +30,16 @@ export type { ActionState };
 const initial: ActionState = { error: null, success: false };
 
 export function InvestigationForm({ alertId, currentStatus, currentNotes, alert }: Props) {
+  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<InvestigationStatus>(currentStatus);
   const boundAction = updateInvestigationStatus.bind(null, alertId);
   const [state, formAction, isPending] = useActionState(boundAction, initial);
+
+  useEffect(() => {
+    if (state.success) {
+      router.refresh();
+    }
+  }, [state.success, router]);
 
   return (
     <form action={formAction} className="space-y-5">
@@ -69,6 +78,10 @@ export function InvestigationForm({ alertId, currentStatus, currentNotes, alert 
 
       {selectedStatus === 'sar_filed' && (
         <SARNarrativePanel alert={alert} />
+      )}
+
+      {(selectedStatus === 'no_sar_warranted' || selectedStatus === 'false_positive') && (
+        <ClosureReasonPanel />
       )}
 
       {selectedStatus === 'sar_filed' && (

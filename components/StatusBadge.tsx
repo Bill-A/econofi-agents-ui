@@ -11,7 +11,7 @@ const styles: Record<InvestigationStatus, string> = {
 
 export function StatusBadge({ status }: { status: InvestigationStatus }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${styles[status]}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded text-sm font-medium ${styles[status]}`}>
       {INVESTIGATION_STATUS_LABELS[status]}
     </span>
   );

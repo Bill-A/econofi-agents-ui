@@ -38,11 +38,11 @@ export function Footer() {
               Econofi Home
             </Link>
             <Link
-              href="/about"
+              href="/"
               className="text-sm text-white/70 hover:text-[#00a4b4] transition-colors font-medium"
               style={{ fontFamily: 'var(--font-open-sans), Open Sans, sans-serif' }}
             >
-              About
+              Home
             </Link>
             <Link
               href="/alerts"
