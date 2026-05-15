@@ -114,7 +114,7 @@ export function generateNarrative(alert: BsaAmlAlert, institutionType: 'bank' | 
   return `NO TIPPING OFF — 31 USC §5318(g)(2)
 Do not notify the subject, or any person involved in the transaction, that this SAR has been or will be filed. Disclosure of a SAR or its contents is prohibited by law. This document must be stored securely and access limited to those with a need to know.
 
-FILING DEADLINE: ${filingDeadline} (30 days from detection per 31 CFR §1020.320)
+FILING DEADLINE: ${filingDeadline} — Standard deadline is 30 calendar days from initial detection (31 CFR §1020.320). If no suspect was identified at detection, the deadline extends to 60 calendar days maximum. For violations requiring immediate attention (e.g., ongoing money laundering), notify law enforcement by telephone immediately in addition to timely SAR filing.
 
 ---
 
@@ -129,7 +129,13 @@ Total dollar amount involved: ${totalAmount}
 
 PRIOR SAR FILINGS
 
-[PRIOR SAR REFERENCE — REVIEW REQUIRED: Enter any prior SAR filing number(s) for this subject at this institution. If no prior SARs exist, state "No prior SARs on file for this subject."]
+FinCEN Form 111 contains dedicated fields for prior filings — complete these on the form itself, not in this narrative:
+  • "Continuing activity report" checkbox (Item 1) — check if this SAR covers activity already reported in a prior filing
+  • "Correct/amend prior report" checkbox (Item 1) — check if this filing corrects a prior SAR
+  • "Prior report BSA Identifier / document control number" field — required if either box above is checked
+  • Do NOT include dollar amounts from prior SARs in Item 29 (amount field) — report current period only
+
+[PRIOR SAR NARRATIVE NOTE — REVIEW REQUIRED: If this is a continuing activity report, state the prior BSA Identifier(s) and describe what activity is new in this filing period.]
 
 DESCRIPTION OF SUSPICIOUS ACTIVITY
 
