@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getAlert, getAlertEvents } from '@/lib/api';
+import { getAlert, getAlertEvents, getAllAlerts } from '@/lib/api';
 import { ALERT_TYPE_LABELS, RECOMMENDED_ACTION_LABELS } from '@/lib/types';
 import { SeverityBadge } from '@/components/SeverityBadge';
 import { StatusBadge } from '@/components/StatusBadge';
 import { AuditTrail } from '@/components/AuditTrail';
+import { FlaggedTransactionsPanel } from '@/components/FlaggedTransactionsPanel';
+import { CustomerIdentityPanel } from '@/components/CustomerIdentityPanel';
+import { CustomerAlertHistory } from '@/components/CustomerAlertHistory';
 import { InvestigationForm } from './InvestigationForm';
 
 interface PageProps {
@@ -13,14 +16,19 @@ interface PageProps {
 
 export default async function AlertDetailPage({ params }: PageProps) {
   const { alert_id: alertId } = await params;
-  const [alert, events] = await Promise.all([
+  const [alert, events, allAlerts] = await Promise.all([
     getAlert(alertId),
     getAlertEvents(alertId),
+    getAllAlerts(),
   ]);
 
   if (alert === null) {
     notFound();
   }
+
+  const relatedAlerts = allAlerts.filter(
+    a => a.customer_token === alert.customer_token && a.alert_id !== alertId,
+  );
 
   const confidencePct = alert.confidence_score !== null ? `${alert.confidence_score}%` : 'N/A';
   const fpPct = alert.false_positive_probability !== null
@@ -36,6 +44,8 @@ export default async function AlertDetailPage({ params }: PageProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+        {/* Left column — alert detail */}
         <div className="lg:col-span-3 space-y-6">
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <div className="flex items-start justify-between mb-4">
@@ -79,12 +89,14 @@ export default async function AlertDetailPage({ params }: PageProps) {
             <ul className="space-y-2">
               {alert.suspicious_indicators.map((indicator, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                  <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-400" />
+                  <span className="mt-1 shrink-0 w-1.5 h-1.5 rounded-full bg-orange-400" />
                   {indicator}
                 </li>
               ))}
             </ul>
           </div>
+
+          <FlaggedTransactionsPanel transactions={alert.transactions_flagged} />
 
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
@@ -124,6 +136,7 @@ export default async function AlertDetailPage({ params }: PageProps) {
           </div>
         </div>
 
+        {/* Right column — investigation + identity + history */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
@@ -148,6 +161,16 @@ export default async function AlertDetailPage({ params }: PageProps) {
               })}
             </div>
           )}
+
+          <CustomerIdentityPanel
+            customerToken={alert.customer_token}
+            accountHash={alert.account_hash}
+          />
+
+          <CustomerAlertHistory
+            relatedAlerts={relatedAlerts}
+            customerToken={alert.customer_token}
+          />
 
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
             <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
