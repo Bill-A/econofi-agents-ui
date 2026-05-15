@@ -1,4 +1,4 @@
-import type { BsaAmlAlert, AlertType } from './types';
+import type { BsaAmlAlert, AlertType, FlaggedTransaction } from './types';
 import { ALERT_TYPE_LABELS } from './types';
 
 const PLACEHOLDER_RE = /\[[A-Z][^\[\]]*— REVIEW REQUIRED\]/g;
@@ -19,6 +19,53 @@ export function parseNarrative(text: string): Array<{ type: 'text' | 'placeholde
     segments.push({ type: 'text', value: text.slice(lastIndex) });
   }
   return segments;
+}
+
+function formatCurrency(amount: number): string {
+  return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}
+
+function formatLongDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'long', day: 'numeric', year: 'numeric',
+  });
+}
+
+function formatShortDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: '2-digit', day: '2-digit', year: 'numeric',
+  });
+}
+
+function formatTransactionType(type: string): string {
+  return type.replace(/_/g, ' ');
+}
+
+function sortedTransactions(txns: FlaggedTransaction[]): FlaggedTransaction[] {
+  return [...txns].sort(
+    (a, b) => new Date(a.transaction_date).getTime() - new Date(b.transaction_date).getTime(),
+  );
+}
+
+function buildTransactionChronology(txns: FlaggedTransaction[]): string {
+  return sortedTransactions(txns)
+    .map((txn, i) => {
+      const channel = txn.is_online_banking ? 'via online banking' : 'at a branch';
+      return `  (${i + 1}) ${formatLongDate(txn.transaction_date)}: ${formatCurrency(txn.amount)} ${formatTransactionType(txn.transaction_type)} ${channel} (ID: ${txn.transaction_id})`;
+    })
+    .join('\n');
+}
+
+function getActivityDateRange(txns: FlaggedTransaction[]): { from: string; to: string } {
+  const sorted = sortedTransactions(txns);
+  return {
+    from: formatShortDate(sorted[0].transaction_date),
+    to: formatShortDate(sorted[sorted.length - 1].transaction_date),
+  };
+}
+
+function getTotalAmount(txns: FlaggedTransaction[]): string {
+  return formatCurrency(txns.reduce((sum, t) => sum + t.amount, 0));
 }
 
 const MDI_CONTEXT: Record<AlertType, Record<'bank' | 'credit_union', string>> = {
@@ -50,24 +97,37 @@ const MDI_CONTEXT: Record<AlertType, Record<'bank' | 'credit_union', string>> = 
 
 export function generateNarrative(alert: BsaAmlAlert, institutionType: 'bank' | 'credit_union'): string {
   const alertTypeLabel = ALERT_TYPE_LABELS[alert.alert_type];
-  const accountShort = alert.account_hash.slice(0, 8) + '...';
-  const alertDate = new Date(alert.created_at).toLocaleDateString('en-US', {
-    month: '2-digit', day: '2-digit', year: 'numeric',
-  });
+  const alertDate = formatShortDate(alert.created_at);
   const mdiContext = MDI_CONTEXT[alert.alert_type][institutionType];
-  const indicatorLines = alert.suspicious_indicators
-    .map((ind) => `  • ${ind}`)
-    .join('\n');
+  const indicatorLines = alert.suspicious_indicators.map((ind) => `  • ${ind}`).join('\n');
+
+  const txns = alert.transactions_flagged;
+  const chronology = txns.length > 0 ? buildTransactionChronology(txns) : '  [NO TRANSACTIONS AVAILABLE — REVIEW REQUIRED]';
+  const dateRange = txns.length > 0 ? getActivityDateRange(txns) : { from: '[START DATE — REVIEW REQUIRED]', to: '[END DATE — REVIEW REQUIRED]' };
+  const totalAmount = txns.length > 0 ? getTotalAmount(txns) : '[TOTAL AMOUNT — REVIEW REQUIRED]';
 
   return `SUBJECT OF SUSPICIOUS ACTIVITY
 
-[INSTITUTION NAME — REVIEW REQUIRED] files this Suspicious Activity Report regarding ${alert.customer_token}, holder of account ${accountShort}. Alert ID: ${alert.alert_id}.
+IMPORTANT: ${alert.customer_token} is a system-assigned privacy token. Before filing, replace with the subject's full legal name, SSN/TIN, date of birth, address, and account number from your institution's records and de-tokenization vault. Do not submit this document with token references.
+
+[INSTITUTION NAME — REVIEW REQUIRED] files this Suspicious Activity Report regarding [SUBJECT FULL NAME — REVIEW REQUIRED], holder of account [ACCOUNT NUMBER — REVIEW REQUIRED]. System reference: ${alert.customer_token}. Alert ID: ${alert.alert_id}.
+
+Activity period: ${dateRange.from} through ${dateRange.to}
+Total dollar amount involved: ${totalAmount}
+
+PRIOR SAR FILINGS
+
+[PRIOR SAR REFERENCE — REVIEW REQUIRED: Enter any prior SAR filing number(s) for this subject at this institution. If no prior SARs exist, state "No prior SARs on file for this subject."]
 
 DESCRIPTION OF SUSPICIOUS ACTIVITY
 
 Alert classification: ${alertTypeLabel} — Risk Score ${alert.risk_score}/100.
 
-The following suspicious indicators were identified by the monitoring system on ${alertDate}:
+The following transactions were identified during the activity period:
+
+${chronology}
+
+The following suspicious indicators were identified by the automated monitoring system on ${alertDate}:
 
 ${indicatorLines}
 

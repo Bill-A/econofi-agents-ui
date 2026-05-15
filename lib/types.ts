@@ -41,6 +41,14 @@ export const CLOSURE_REASON_LABELS: Record<ClosureReasonCode, string> = {
   other: 'Other',
 };
 
+export interface FlaggedTransaction {
+  transaction_id: string;
+  amount: number;
+  transaction_type: string;
+  transaction_date: string;
+  is_online_banking: boolean;
+}
+
 export interface BsaAmlAlert {
   id: string;
   alert_id: string;
@@ -49,7 +57,7 @@ export interface BsaAmlAlert {
   risk_score: number;
   alert_type: AlertType;
   severity: AlertSeverity;
-  transactions_flagged: unknown;
+  transactions_flagged: FlaggedTransaction[];
   suspicious_indicators: string[];
   regulatory_citation: string;
   recommended_action: RecommendedAction;
