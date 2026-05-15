@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { href: '/', label: 'Home' },
+  { href: '/about', label: 'Home' },
   { href: '/alerts', label: 'Alert Dashboard' },
   { href: '/screen', label: 'Transaction Screener' },
 ];
@@ -19,7 +19,7 @@ export function Nav() {
         Demo Environment — Synthetic Data Only
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-[70px] sm:h-[120px]">
+        <div className="flex items-center justify-between h-17.5 sm:h-30">
 
           {/* Logo — 36px mobile / 48px desktop, stacked label below on desktop */}
           <Link href="/alerts" className="flex flex-col items-start justify-center gap-0.5 shrink-0">
@@ -39,9 +39,7 @@ export function Nav() {
           {/* Nav links — full-height click area, inner span carries the border-radius arc (econofi.app pattern) */}
           <div className="flex items-center gap-0 h-full">
             {links.map((link) => {
-              const active = link.href === '/'
-                ? pathname === '/'
-                : pathname === link.href || pathname.startsWith(link.href + '/');
+              const active = pathname === link.href || pathname.startsWith(link.href + '/');
               return (
                 <Link
                   key={link.href}
@@ -49,7 +47,7 @@ export function Nav() {
                   className="h-full flex items-center px-1"
                 >
                   <span
-                    className={`px-[10px] py-[10px] text-sm sm:text-[18px] leading-[30px] transition-all rounded-[7px] border-b-2 ${
+                    className={`px-2.5 py-2.5 text-sm sm:text-[18px] leading-7.5 transition-all rounded-[7px] border-b-2 ${
                       active
                         ? 'text-[#00a4b4] border-[#00a4b4] font-bold'
                         : 'text-[#eff2fb]/70 border-transparent font-semibold hover:text-[#42e8e0]'

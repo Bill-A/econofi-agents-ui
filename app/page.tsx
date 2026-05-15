@@ -7,7 +7,7 @@ const steps = [
     title: 'Open the Alert Dashboard',
     href: '/alerts',
     description:
-      'This is your daily starting point. The dashboard shows every active BSA/AML alert scoped to your bank, filtered by severity or investigation status. Four pre-seeded alerts are ready to work.',
+      'This is your daily starting point. The dashboard shows every active BSA/AML alert scoped to your bank, filtered by severity or investigation status. Fifteen pre-seeded alerts across all five investigation statuses are ready to work.',
   },
   {
     number: '02',
@@ -171,9 +171,9 @@ export default function HomePage() {
       {/* Pre-seeded scenarios */}
       <section>
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-[#13204c]">Demo alerts in the dashboard</h2>
+          <h2 className="text-xl font-bold text-[#13204c]">Featured alerts in the dashboard</h2>
           <p className="mt-1 text-sm text-[#3d4557]">
-            Four alerts are pre-loaded, each representing a distinct BSA/AML pattern with real regulatory citations and synthetic transaction data.
+            Fifteen alerts are pre-loaded across all five investigation statuses. Four key patterns are highlighted below — each with real regulatory citations and synthetic transaction data.
           </p>
         </div>
         <div className="space-y-4">
