@@ -20,3 +20,62 @@ body {
   background: #f7f8fa;
   color: #1a1d26;
 }
+
+@media print {
+  /* Hide chrome */
+  nav,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Full-width content, no chrome */
+  body {
+    background: white !important;
+    font-size: 11pt;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Remove decorative shadows and backgrounds */
+  .shadow-sm,
+  .shadow {
+    box-shadow: none !important;
+  }
+
+  /* Ensure content is black on white */
+  * {
+    background-color: transparent !important;
+    color: black !important;
+    border-color: #ccc !important;
+  }
+
+  /* Keep colored severity/status badges readable */
+  [class*="bg-red"],
+  [class*="bg-orange"],
+  [class*="bg-amber"],
+  [class*="bg-green"],
+  [class*="bg-teal"] {
+    background-color: #eee !important;
+  }
+
+  /* Page breaks */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  /* Print header — hidden on screen, shown in print */
+  .print-header {
+    display: block !important;
+    border-bottom: 2pt solid black;
+    padding-bottom: 8pt;
+    margin-bottom: 16pt;
+  }
+}
+
+/* Print header is hidden on screen */
+.print-header {
+  display: none;
+}

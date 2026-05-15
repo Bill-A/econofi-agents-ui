@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getAlerts, getAllAlerts } from '@/lib/api';
 import { ALERT_TYPE_LABELS } from '@/lib/types';
@@ -7,8 +8,29 @@ import { SeverityBadge } from '@/components/SeverityBadge';
 import { StatusBadge } from '@/components/StatusBadge';
 import { AlertFilters } from './AlertFilters';
 
+export const metadata: Metadata = {
+  title: 'Alert Dashboard | Econofi BSA/AML',
+  description: 'BSA/AML alert management and investigation workflow.',
+};
+
+type SortBy = 'risk_score' | 'age' | 'severity';
+type SortDir = 'asc' | 'desc';
+
+const SEVERITY_ORDER: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+
+function sortAlerts(alerts: BsaAmlAlert[], sortBy: SortBy, sortDir: SortDir): BsaAmlAlert[] {
+  return [...alerts].sort((a, b) => {
+    let diff = 0;
+    if (sortBy === 'risk_score') diff = a.risk_score - b.risk_score;
+    else if (sortBy === 'age') diff = alertAgeDays(a.created_at) - alertAgeDays(b.created_at);
+    else if (sortBy === 'severity')
+      diff = (SEVERITY_ORDER[a.severity] ?? 0) - (SEVERITY_ORDER[b.severity] ?? 0);
+    return sortDir === 'asc' ? diff : -diff;
+  });
+}
+
 interface PageProps {
-  searchParams: Promise<{ severity?: string; status?: string; page?: string }>;
+  searchParams: Promise<{ severity?: string; status?: string; page?: string; sortBy?: string; sortDir?: string }>;
 }
 
 function AgeCell({ alert }: { alert: BsaAmlAlert }) {
@@ -33,6 +55,8 @@ function AgeCell({ alert }: { alert: BsaAmlAlert }) {
 export default async function AlertsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
+  const sortBy = (params.sortBy ?? 'risk_score') as SortBy;
+  const sortDir = (params.sortDir ?? 'desc') as SortDir;
   const isOverdueFilter = params.status === 'overdue';
 
   const [pageResult, allAlerts] = await Promise.all([
@@ -49,10 +73,10 @@ export default async function AlertsPage({ searchParams }: PageProps) {
     const filtered = allAlerts.filter(
       a => isOverdue(a) && (!params.severity || a.severity === params.severity),
     );
-    alerts = filtered;
+    alerts = sortAlerts(filtered, sortBy, sortDir);
     pagination = { total: filtered.length, page: 1, per_page: filtered.length, total_pages: 1 };
   } else {
-    alerts = pageResult!.alerts;
+    alerts = sortAlerts(pageResult!.alerts, sortBy, sortDir);
     pagination = pageResult!.pagination;
   }
 
@@ -173,13 +197,31 @@ export default async function AlertsPage({ searchParams }: PageProps) {
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-[#e9ecef]">
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Alert ID</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Type</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Severity</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Risk</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Customer</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Status</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Age</th>
+                  {[
+                    { label: 'Alert ID', key: null },
+                    { label: 'Type', key: null },
+                    { label: 'Severity', key: 'severity' as SortBy },
+                    { label: 'Risk', key: 'risk_score' as SortBy },
+                    { label: 'Customer', key: null },
+                    { label: 'Status', key: null },
+                    { label: 'Age', key: 'age' as SortBy },
+                  ].map(({ label, key }) => {
+                    const isActive = key && sortBy === key;
+                    const nextDir = isActive && sortDir === 'desc' ? 'asc' : 'desc';
+                    const href = key
+                      ? `/alerts?${new URLSearchParams({ ...(params.severity ? { severity: params.severity } : {}), ...(params.status ? { status: params.status } : {}), sortBy: key, sortDir: nextDir }).toString()}`
+                      : undefined;
+                    return (
+                      <th key={label} className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">
+                        {href ? (
+                          <Link href={href} className={`inline-flex items-center gap-1 hover:text-[#13204c] transition-colors ${isActive ? 'text-[#13204c]' : ''}`}>
+                            {label}
+                            <span className="text-xs">{isActive ? (sortDir === 'desc' ? '↓' : '↑') : '↕'}</span>
+                          </Link>
+                        ) : label}
+                      </th>
+                    );
+                  })}
                   <th className="px-6 py-4 bg-white" />
                 </tr>
               </thead>

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getAlert, getAlertEvents, getAllAlerts } from '@/lib/api';
@@ -9,9 +10,21 @@ import { FlaggedTransactionsPanel } from '@/components/FlaggedTransactionsPanel'
 import { CustomerIdentityPanel } from '@/components/CustomerIdentityPanel';
 import { CustomerAlertHistory } from '@/components/CustomerAlertHistory';
 import { InvestigationForm } from './InvestigationForm';
+import { PrintButton } from '@/components/PrintButton';
 
 interface PageProps {
   params: Promise<{ alert_id: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { alert_id: alertId } = await params;
+  const alert = await getAlert(alertId);
+  if (!alert) return { title: 'Alert Not Found | Econofi' };
+  const typeLabel = alert.alert_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  return {
+    title: `${alertId} · ${typeLabel} | Econofi BSA/AML`,
+    description: `${alert.severity.toUpperCase()} severity BSA/AML alert — Risk score ${alert.risk_score}/100`,
+  };
 }
 
 export default async function AlertDetailPage({ params }: PageProps) {
@@ -37,10 +50,18 @@ export default async function AlertDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
+      {/* Print-only case file header */}
+      <div className="print-header">
+        <p className="text-xs font-mono font-bold uppercase tracking-widest">Econofi BSA/AML — Case File</p>
+        <p className="text-xs font-mono text-gray-600">Alert: {alertId} · Generated: {new Date().toLocaleString('en-US')}</p>
+        <p className="text-xs text-gray-500 mt-1">CONFIDENTIAL — For authorized compliance personnel only. Not a filed SAR.</p>
+      </div>
+
+      <div className="mb-6 flex items-center justify-between print:hidden">
         <Link href="/alerts" className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
           <span aria-hidden>←</span> Back to Alert Dashboard
         </Link>
+        <PrintButton />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
