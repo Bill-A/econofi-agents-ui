@@ -175,6 +175,17 @@ export default async function AlertsPage({ searchParams }: PageProps) {
         </div>
       )}
 
+      {/* Overdue filter active banner */}
+      {isOverdueFilter && (
+        <div className="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+          <span className="text-amber-600 font-semibold text-sm">⚠ Overdue filter active</span>
+          <span className="text-amber-700 text-sm">Showing only open alerts past the 25-day SAR deadline. Closed alerts (SAR Filed, No SAR, False Positive) are hidden.</span>
+          <Link href="/alerts" className="ml-auto text-sm font-semibold text-[#0d7a6b] hover:underline whitespace-nowrap">
+            Show all alerts
+          </Link>
+        </div>
+      )}
+
       {/* Table card */}
       <div className="bg-white rounded-lg border border-[#e9ecef] shadow-sm overflow-hidden">
 
