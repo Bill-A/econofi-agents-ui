@@ -99,8 +99,8 @@ export function SARNarrativePanel({ alert }: Props) {
       {/* Panel header */}
       <div className="bg-[#f7f8fa] border-b border-[#e9ecef] px-4 py-3 flex items-center justify-between">
         <div>
-          <span className="text-xs font-semibold text-[#13204c] uppercase tracking-wide">SAR Narrative Draft</span>
-          <span className="ml-2 text-xs font-mono text-[#3d4557]">{alert.alert_id}</span>
+          <span className="text-sm font-semibold text-[#13204c] uppercase tracking-wide">SAR Narrative Draft</span>
+          <span className="ml-2 text-sm font-mono text-[#3d4557]">{alert.alert_id}</span>
         </div>
         <div className="flex items-center gap-1 bg-white border border-[#e9ecef] rounded-md p-0.5">
           <button
@@ -149,7 +149,7 @@ export function SARNarrativePanel({ alert }: Props) {
         contentEditable
         suppressContentEditableWarning
         spellCheck={false}
-        className="px-4 py-4 font-mono text-xs leading-7 text-[#1a1d26] bg-white whitespace-pre-wrap outline-none focus:ring-1 focus:ring-[#13204c] min-h-48"
+        className="px-5 py-5 font-mono text-sm leading-7 text-[#1a1d26] bg-white whitespace-pre-wrap outline-none focus:ring-1 focus:ring-[#13204c] min-h-128"
       >
         {segments.map((seg, i) =>
           seg.type === 'placeholder' ? (
