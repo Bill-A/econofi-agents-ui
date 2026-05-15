@@ -18,12 +18,9 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { alert_id: alertId } = await params;
-  const alert = await getAlert(alertId);
-  if (!alert) return { title: 'Alert Not Found | Econofi' };
-  const typeLabel = alert.alert_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   return {
-    title: `${alertId} · ${typeLabel} | Econofi BSA/AML`,
-    description: `${alert.severity.toUpperCase()} severity BSA/AML alert — Risk score ${alert.risk_score}/100`,
+    title: `${alertId} | Econofi BSA/AML`,
+    description: `BSA/AML alert investigation — ${alertId}`,
   };
 }
 
