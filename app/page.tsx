@@ -34,19 +34,19 @@ const steps = [
 
 const scenarios = [
   {
-    id: 'ALT-2026-05-04-00001',
+    id: 'ALT-2026-05-11-00001',
     label: 'Structuring',
-    severity: 'HIGH',
-    severityColor: 'bg-orange-50 text-orange-700 border-orange-200',
-    riskScore: 87,
+    severity: 'CRITICAL',
+    severityColor: 'bg-red-50 text-red-700 border-red-200',
+    riskScore: 91,
     riskColor: 'bg-red-500',
     citation: '31 USC §5324',
     description:
-      'Three cash deposits of $9,200, $9,400, and $9,150 across three branches within a 5-day window — each individually below the $10,000 CTR threshold. Pattern consistent with deliberate structuring to avoid reporting.',
+      'Three cash deposits deliberately kept below the $10,000 CTR threshold across multiple branches within a short window. Elevated to Critical — second structuring pattern on this customer within the quarter.',
     whatToLookFor: [
       'Deposits deliberately kept under $10,000',
       'Multiple branches within a short window',
-      'No corresponding business activity',
+      'Prior structuring alert on same customer this quarter',
     ],
     action: 'File SAR',
   },
