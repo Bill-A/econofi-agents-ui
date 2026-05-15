@@ -54,6 +54,7 @@ export function AlertFilters({ severity, status }: Props) {
         <option value="sar_filed">SAR Filed</option>
         <option value="no_sar_warranted">No SAR Warranted</option>
         <option value="false_positive">False Positive</option>
+        <option value="overdue">Overdue (&gt;25 days open)</option>
       </select>
     </div>
   );

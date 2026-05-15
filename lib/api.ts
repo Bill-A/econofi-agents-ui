@@ -40,6 +40,11 @@ export async function getAlerts(params: {
   return envelope.data ?? { alerts: [], pagination: { total: 0, page: 1, per_page: 25, total_pages: 0 } };
 }
 
+export async function getAllAlerts(): Promise<BsaAmlAlert[]> {
+  const envelope = await apiFetch<AlertListResponse>('/v1/alerts?per_page=500');
+  return envelope.data?.alerts ?? [];
+}
+
 export async function getAlert(alertId: string): Promise<BsaAmlAlert | null> {
   const envelope = await apiFetch<BsaAmlAlert>(`/v1/alerts/${alertId}`);
   return envelope.data;

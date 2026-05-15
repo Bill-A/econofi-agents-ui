@@ -69,6 +69,7 @@ export interface BsaAmlAlert {
   investigation_status: InvestigationStatus;
   investigation_notes: string | null;
   investigation_completed_at: string | null;
+  sar_reference_number: string | null;
   closure_reason_code: string | null;
   closure_reason_detail: string | null;
 }

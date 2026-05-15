@@ -87,18 +87,22 @@ export function InvestigationForm({ alertId, currentStatus, currentNotes, alert 
       {selectedStatus === 'sar_filed' && (
         <div>
           <label htmlFor="sar_reference_number" className="block text-sm font-medium text-gray-700 mb-1">
-            SAR Reference Number <span className="text-red-500">*</span>
+            SAR Reference Number{' '}
+            {!alert.sar_reference_number && <span className="text-red-500">*</span>}
           </label>
           <input
             id="sar_reference_number"
             name="sar_reference_number"
             type="text"
-            required
+            required={!alert.sar_reference_number}
+            defaultValue={alert.sar_reference_number ?? ''}
             placeholder="e.g. SAR-2026-001"
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <p className="mt-1 text-xs text-gray-500">
-            Required when filing a SAR. Enter the FinCEN reference number assigned at submission.
+            {alert.sar_reference_number
+              ? 'FinCEN reference number on file — update if re-filed.'
+              : 'Enter the FinCEN reference number assigned at submission.'}
           </p>
         </div>
       )}

@@ -1,6 +1,8 @@
 import Link from 'next/link';
-import { getAlerts } from '@/lib/api';
+import { getAlerts, getAllAlerts } from '@/lib/api';
 import { ALERT_TYPE_LABELS } from '@/lib/types';
+import type { BsaAmlAlert } from '@/lib/types';
+import { alertAgeDays, isAlertOpen, isOverdue } from '@/lib/utils';
 import { SeverityBadge } from '@/components/SeverityBadge';
 import { StatusBadge } from '@/components/StatusBadge';
 import { AlertFilters } from './AlertFilters';
@@ -9,16 +11,77 @@ interface PageProps {
   searchParams: Promise<{ severity?: string; status?: string; page?: string }>;
 }
 
+function AgeCell({ alert }: { alert: BsaAmlAlert }) {
+  const days = alertAgeDays(alert.created_at);
+  const open = isAlertOpen(alert.investigation_status);
+  const overdue = open && days > 25;
+
+  if (overdue) {
+    return (
+      <div className="flex flex-col gap-0.5">
+        <span className="text-sm font-bold text-red-600">{days}d</span>
+        <span className="text-xs font-semibold text-red-500 uppercase tracking-wide">Overdue</span>
+      </div>
+    );
+  }
+  if (open && days > 15) {
+    return <span className="text-base font-semibold text-amber-600">{days}d</span>;
+  }
+  return <span className="text-base text-[#3d4557]">{days}d</span>;
+}
+
 export default async function AlertsPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const page = Math.max(1, parseInt(params.page ?? '1', 10));
+  const isOverdueFilter = params.status === 'overdue';
 
-  const { alerts, pagination } = await getAlerts({
-    severity: params.severity,
-    status: params.status,
-    page,
-    per_page: 25,
-  });
+  const [pageResult, allAlerts] = await Promise.all([
+    isOverdueFilter
+      ? Promise.resolve(null)
+      : getAlerts({ severity: params.severity, status: params.status, page, per_page: 25 }),
+    getAllAlerts(),
+  ]);
+
+  let alerts: BsaAmlAlert[];
+  let pagination: { total: number; page: number; per_page: number; total_pages: number };
+
+  if (isOverdueFilter) {
+    const filtered = allAlerts.filter(
+      a => isOverdue(a) && (!params.severity || a.severity === params.severity),
+    );
+    alerts = filtered;
+    pagination = { total: filtered.length, page: 1, per_page: filtered.length, total_pages: 1 };
+  } else {
+    alerts = pageResult!.alerts;
+    pagination = pageResult!.pagination;
+  }
+
+  // KPI stats from all alerts
+  const now = new Date();
+  const pendingCritical = allAlerts.filter(
+    a => a.severity === 'critical' && isAlertOpen(a.investigation_status),
+  ).length;
+  const overdueCount = allAlerts.filter(a => isOverdue(a)).length;
+  const sarThisMonth = allAlerts.filter(a => {
+    if (a.investigation_status !== 'sar_filed' || !a.investigation_completed_at) return false;
+    const d = new Date(a.investigation_completed_at);
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+  const closedWithDates = allAlerts.filter(
+    a => !isAlertOpen(a.investigation_status) && a.investigation_completed_at,
+  );
+  const avgDaysToClose =
+    closedWithDates.length > 0
+      ? Math.round(
+          closedWithDates.reduce((sum, a) => {
+            return (
+              sum +
+              (new Date(a.investigation_completed_at!).getTime() - new Date(a.created_at).getTime()) /
+                86_400_000
+            );
+          }, 0) / closedWithDates.length,
+        )
+      : null;
 
   const start = (page - 1) * 25 + 1;
   const end = Math.min(page * 25, pagination.total);
@@ -42,6 +105,38 @@ export default async function AlertsPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white border border-red-200 rounded-lg px-5 py-4">
+          <p className="text-xs font-semibold text-red-500 uppercase tracking-wide">Pending Critical</p>
+          <p className="text-3xl font-bold text-red-600 mt-1">{pendingCritical}</p>
+          <p className="text-xs text-red-400 mt-1">open &amp; critical severity</p>
+        </div>
+        <div className={`bg-white rounded-lg px-5 py-4 border ${overdueCount > 0 ? 'border-amber-300' : 'border-[#e9ecef]'}`}>
+          <p className={`text-xs font-semibold uppercase tracking-wide ${overdueCount > 0 ? 'text-amber-600' : 'text-[#3d4557]'}`}>
+            Overdue
+          </p>
+          <p className={`text-3xl font-bold mt-1 ${overdueCount > 0 ? 'text-amber-600' : 'text-[#13204c]'}`}>
+            {overdueCount}
+          </p>
+          <p className="text-xs text-[#3d4557] mt-1">open &gt;25 days</p>
+        </div>
+        <div className="bg-white border border-[#0d7a6b]/30 rounded-lg px-5 py-4">
+          <p className="text-xs font-semibold text-[#0d7a6b] uppercase tracking-wide">SARs This Month</p>
+          <p className="text-3xl font-bold text-[#0d7a6b] mt-1">{sarThisMonth}</p>
+          <p className="text-xs text-[#3d4557] mt-1">
+            {now.toLocaleString('en-US', { month: 'long' })} {now.getFullYear()}
+          </p>
+        </div>
+        <div className="bg-white border border-[#13204c]/20 rounded-lg px-5 py-4">
+          <p className="text-xs font-semibold text-[#13204c] uppercase tracking-wide">Avg Days to Close</p>
+          <p className="text-3xl font-bold text-[#13204c] mt-1">
+            {avgDaysToClose !== null ? `${avgDaysToClose}d` : '—'}
+          </p>
+          <p className="text-xs text-[#3d4557] mt-1">closed alerts</p>
+        </div>
+      </div>
+
       {/* Alert count summary bar */}
       {pagination.total > 0 && (
         <div className="mb-4 flex items-center gap-2">
@@ -49,10 +144,7 @@ export default async function AlertsPage({ searchParams }: PageProps) {
             {pagination.total} alert{pagination.total !== 1 ? 's' : ''}
           </span>
           {(params.severity || params.status) && (
-            <Link
-              href="/alerts"
-              className="text-base text-[#0d7a6b] hover:underline font-medium"
-            >
+            <Link href="/alerts" className="text-base text-[#0d7a6b] hover:underline font-medium">
               Clear filters
             </Link>
           )}
@@ -87,7 +179,7 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                   <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Risk</th>
                   <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Customer</th>
                   <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Status</th>
-                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Date</th>
+                  <th className="px-6 py-4 text-left text-base font-semibold text-[#3d4557] uppercase tracking-wider bg-white">Age</th>
                   <th className="px-6 py-4 bg-white" />
                 </tr>
               </thead>
@@ -96,7 +188,7 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                   <tr
                     key={alert.id}
                     className={`border-b border-[#e9ecef] hover:bg-[#e6f4f2]/40 transition-colors ${
-                      i % 2 === 0 ? 'bg-white' : 'bg-[#f7f8fa]'
+                      isOverdue(alert) ? 'bg-red-50/40' : i % 2 === 0 ? 'bg-white' : 'bg-[#f7f8fa]'
                     }`}
                   >
                     <td className="px-6 py-5 whitespace-nowrap">
@@ -136,13 +228,7 @@ export default async function AlertsPage({ searchParams }: PageProps) {
                       <StatusBadge status={alert.investigation_status} />
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
-                      <span className="text-lg text-[#3d4557]">
-                        {new Date(alert.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })}
-                      </span>
+                      <AgeCell alert={alert} />
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap text-right">
                       <Link
