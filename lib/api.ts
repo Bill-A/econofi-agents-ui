@@ -41,7 +41,7 @@ export async function getAlerts(params: {
 }
 
 export async function getAllAlerts(): Promise<BsaAmlAlert[]> {
-  const envelope = await apiFetch<AlertListResponse>('/v1/alerts?per_page=500');
+  const envelope = await apiFetch<AlertListResponse>('/v1/alerts?per_page=100');
   return envelope.data?.alerts ?? [];
 }
 
